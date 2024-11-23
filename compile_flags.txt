@@ -1,0 +1,5 @@
+-I
+/usr/include/SDL2
+-I
+/usr/include/GLES2
+-xc++
