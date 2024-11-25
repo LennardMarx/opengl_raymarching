@@ -1,24 +1,4 @@
 //
-// Emscripten/SDL2/OpenGLES2 sample that displays a texture created from an
-// image file
-//
-// Setup:
-//     Install emscripten:
-//     http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html
-//
-// Build on Mac/Linux:
-//     emcc -std=c++11 hello_texture.cpp events.cpp camera.cpp -s USE_SDL=2 -s
-//     USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' -s FULL_ES2=1 -s WASM=0
-//     --preload-file media/texmap.png -o hello_texture.html
-// Build on Windows:
-//     emcc -std=c++11 hello_texture.cpp events.cpp camera.cpp -s USE_SDL=2 -s
-//     USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS="[""png""]" -s FULL_ES2=1 -s WASM=0
-//     --preload-file media/texmap.png -o hello_texture.html
-//
-// Run:
-//     emrun hello_texture.html
-//
-// Result:
 //     A textured triangle.  Left mouse pans, mouse wheel zooms in/out.  Window
 //     is resizable.
 //
@@ -56,6 +36,33 @@ std::string readShaderFile(const std::string &filePath) {
   std::stringstream shaderStream;
   shaderStream << shaderFile.rdbuf();
   return shaderStream.str();
+}
+
+auto start_time = std::chrono::high_resolution_clock::now();
+
+void passTime(GLuint shaderProgram) {
+  auto current_time = std::chrono::high_resolution_clock::now();
+
+  GLuint milliseconds_since_start =
+      std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+                                                            start_time)
+          .count();
+
+  // std::cout << "Program has been running for " << milliseconds_since_start
+  //           << " seconds" << std::endl;
+
+  // double seconds_since_start = difftime(time(0), start);
+  // std::cout << seconds_since_start << std::endl;
+
+  GLint u_TimeLocation = glGetUniformLocation(shaderProgram, "u_Time");
+  if (u_TimeLocation >= 0) {
+    // std::cout << "location of u_offset: " << location << std::endl;
+    // glUniformMatrix4fv(u_TimeLocation, 1, GL_FALSE, &model[0][0]);
+    glUniform1i(u_TimeLocation, milliseconds_since_start);
+  } else {
+    std::cout << "Could not find u_TimeLocation in memory." << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }
 
 // NOT WORKING: Pointer to local string that goes out of scope
@@ -120,8 +127,19 @@ void initGeometry(GLuint shaderProgram) {
   GLuint vbo;
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  GLfloat triangleVertices[] = {0.0f, 0.5f, 0.0f,  -0.5f, -0.5f,
-                                0.0f, 0.5f, -0.5f, 0.0f};
+  // GLfloat triangleVertices[] = {0.0f, 0.5f, 0.0f,  -0.5f, -0.5f,
+  //                               0.0f, 0.5f, -0.5f, 0.0f};
+  GLfloat triangleVertices[] = {
+      // First triangle
+      -1.0f, -1.0f, 0.0f, // Bottom-left
+      1.0f, -1.0f, 0.0f,  // Bottom-right
+      -1.0f, 1.0f, 0.0f,  // Top-left
+
+      // Second triangle
+      -1.0f, 1.0f, 0.0f, // Top-left
+      1.0f, -1.0f, 0.0f, // Bottom-right
+      1.0f, 1.0f, 0.0f   // Top-right
+  };
   glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices,
                GL_STATIC_DRAW);
 
@@ -183,7 +201,7 @@ void redraw(EventHandler &eventHandler) {
   glClear(GL_COLOR_BUFFER_BIT);
 
   // Draw the vertex buffer
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
 
   // Swap front/back framebuffers
   eventHandler.swapWindow();
