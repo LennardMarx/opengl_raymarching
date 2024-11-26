@@ -202,10 +202,12 @@ float map(vec3 p)
 {
     vec3 q = p;
     // q.x += sin(gTime);
-    q.x += sin(0.8);
+    // q.x += sin(2.0);
+    // q.y -= 2.0;
+    q.x += 2.0;
     float box1 = sdBox(q, vec3(1.0));
 
-    float ground = p.y + 0.5;
+    float ground = p.y + 0.75;
 
     float dist = smin(ground, box1, 5.0);
     return dist;
@@ -254,10 +256,10 @@ void main()
         if(d < 0.001 || t > 100.0) break;
     }
       
-    // col = vec3(t* 0.04 + float(i)*0.004);
+    col = vec3(t* 0.04 + float(i)*0.004);
     // col = palette(t * 0.04 + float(i)*0.005);
 
-    col = vec3(t * 0.2);
+    // col = vec3(t * 0.2);
     
       
     gl_FragColor = vec4(col, 1.0);
