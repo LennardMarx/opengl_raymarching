@@ -35,7 +35,7 @@ if (ENVIRONMENT_IS_NODE) {
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /tmp/tmp9b80mr5d.js
+// include: /tmp/tmprck037c7.js
 
   Module['expectedDataFileDownloads'] ??= 0;
   Module['expectedDataFileDownloads']++;
@@ -213,25 +213,25 @@ Module['FS_createPath']("/", "shaders", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/media/texmap.png", "start": 0, "end": 748485}, {"filename": "/shaders/frag.glsl", "start": 748485, "end": 758168}, {"filename": "/shaders/vert.glsl", "start": 758168, "end": 758513}], "remote_package_size": 758513});
+    loadPackage({"files": [{"filename": "/media/texmap.png", "start": 0, "end": 748485}, {"filename": "/shaders/frag.glsl", "start": 748485, "end": 750508}, {"filename": "/shaders/vert.glsl", "start": 750508, "end": 750853}], "remote_package_size": 750853});
 
   })();
 
-// end include: /tmp/tmp9b80mr5d.js
-// include: /tmp/tmpj062hfkc.js
+// end include: /tmp/tmprck037c7.js
+// include: /tmp/tmpz0chfe77.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if (Module['$ww'] || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /tmp/tmpj062hfkc.js
-// include: /tmp/tmpb3zu41n8.js
+  // end include: /tmp/tmpz0chfe77.js
+// include: /tmp/tmpluenxtoy.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /tmp/tmpb3zu41n8.js
+  // end include: /tmp/tmpluenxtoy.js
 
 
 // Sometimes an existing Module object exists with properties

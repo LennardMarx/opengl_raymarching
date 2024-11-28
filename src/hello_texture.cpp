@@ -38,7 +38,6 @@ std::string readShaderFile(const std::string &filePath) {
 
 auto start_time = std::chrono::high_resolution_clock::now();
 
-// void passTime(GLuint shaderProgram) {
 void passTime() {
   auto current_time = std::chrono::high_resolution_clock::now();
 
@@ -47,26 +46,10 @@ void passTime() {
                                                             start_time)
           .count();
 
-  // std::cout << "Program has been running for " << milliseconds_since_start
-  //           << " seconds" << std::endl;
-
-  // double seconds_since_start = difftime(time(0), start);
-  // std::cout << seconds_since_start << std::endl;
-
-  // GLint u_TimeLocation = glGetUniformLocation(shaderProgram, "u_Time");
-  // if (u_TimeLocation >= 0) {
-  // if (shaderTime >= 0) {
-  // std::cout << "location of u_offset: " << location << std::endl;
-  // glUniformMatrix4fv(u_TimeLocation, 1, GL_FALSE, &model[0][0]);
-  // glUniform1i(u_TimeLocation, milliseconds_since_start);
   glUniform1f(shaderTime, milliseconds_since_start);
   if (shaderTime == -1) {
-    std::cerr << "Could not find u_Time in memory." << std::endl;
+    std::cerr << "Could not find time_mil in memory." << std::endl;
   }
-  // } else {
-  // std::cout << "Could not find u_TimeLocation in memory." << std::endl;
-  // exit(EXIT_FAILURE);
-  // }
 }
 
 void updateShader(EventHandler &eventHandler) {
@@ -106,7 +89,7 @@ GLuint initShader(EventHandler &eventHandler) {
   // shaderPan = glGetUniformLocation(shaderProgram, "pan");
   // shaderZoom = glGetUniformLocation(shaderProgram, "zoom");
   shaderAspect = glGetUniformLocation(shaderProgram, "aspect");
-  shaderTime = glGetUniformLocation(shaderProgram, "uTime");
+  shaderTime = glGetUniformLocation(shaderProgram, "time_mil");
   updateShader(eventHandler);
 
   return shaderProgram;
@@ -117,8 +100,7 @@ void initGeometry(GLuint shaderProgram) {
   GLuint vbo;
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  // GLfloat triangleVertices[] = {0.0f, 0.5f, 0.0f,  -0.5f, -0.5f,
-  //                               0.0f, 0.5f, -0.5f, 0.0f};
+
   GLfloat triangleVertices[] = {
       // First triangle
       -1.0f, -1.0f, 0.0f, // Bottom-left
