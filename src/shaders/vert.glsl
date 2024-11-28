@@ -1,6 +1,7 @@
-uniform vec2 pan;
-uniform float zoom;
-uniform float aspect;
+// uniform vec2 pan;
+// uniform float zoom;
+// uniform float aspect;
+// uniform float uTime;
 attribute vec4 position;
 varying vec2 texCoord;
 void main()

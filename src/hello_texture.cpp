@@ -1,8 +1,3 @@
-//
-//     A textured triangle.  Left mouse pans, mouse wheel zooms in/out.  Window
-//     is resizable.
-//
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -10,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_opengles2.h>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -24,6 +20,8 @@ GLuint textureObj = 0;
 
 // Vertex shader
 GLint shaderPan, shaderZoom, shaderAspect;
+// Time
+GLint shaderTime;
 
 // Function to read shader file
 std::string readShaderFile(const std::string &filePath) {
@@ -40,11 +38,12 @@ std::string readShaderFile(const std::string &filePath) {
 
 auto start_time = std::chrono::high_resolution_clock::now();
 
-void passTime(GLuint shaderProgram) {
+// void passTime(GLuint shaderProgram) {
+void passTime() {
   auto current_time = std::chrono::high_resolution_clock::now();
 
   GLuint milliseconds_since_start =
-      std::chrono::duration_cast<std::chrono::microseconds>(current_time -
+      std::chrono::duration_cast<std::chrono::milliseconds>(current_time -
                                                             start_time)
           .count();
 
@@ -54,39 +53,29 @@ void passTime(GLuint shaderProgram) {
   // double seconds_since_start = difftime(time(0), start);
   // std::cout << seconds_since_start << std::endl;
 
-  GLint u_TimeLocation = glGetUniformLocation(shaderProgram, "u_Time");
-  if (u_TimeLocation >= 0) {
-    // std::cout << "location of u_offset: " << location << std::endl;
-    // glUniformMatrix4fv(u_TimeLocation, 1, GL_FALSE, &model[0][0]);
-    glUniform1i(u_TimeLocation, milliseconds_since_start);
-  } else {
-    std::cout << "Could not find u_TimeLocation in memory." << std::endl;
-    exit(EXIT_FAILURE);
+  // GLint u_TimeLocation = glGetUniformLocation(shaderProgram, "u_Time");
+  // if (u_TimeLocation >= 0) {
+  // if (shaderTime >= 0) {
+  // std::cout << "location of u_offset: " << location << std::endl;
+  // glUniformMatrix4fv(u_TimeLocation, 1, GL_FALSE, &model[0][0]);
+  // glUniform1i(u_TimeLocation, milliseconds_since_start);
+  glUniform1f(shaderTime, milliseconds_since_start);
+  if (shaderTime == -1) {
+    std::cerr << "Could not find u_Time in memory." << std::endl;
   }
+  // } else {
+  // std::cout << "Could not find u_TimeLocation in memory." << std::endl;
+  // exit(EXIT_FAILURE);
+  // }
 }
-
-// NOT WORKING: Pointer to local string that goes out of scope
-// const GLchar *readShaderFile(const std::string &filePath) {
-//   std::ifstream shaderFile(filePath);
-//   // if (!shaderFile.is_open()) {
-//   //   std::cerr << "Failed to open shader file: " << filePath << std::endl;
-//   //   return "";
-//   // }
-//
-//   std::stringstream shaderStream;
-//   shaderStream << shaderFile.rdbuf();
-//   // return shaderStream.str();
-//   std::string str = shaderStream.str();
-//   const char *cstr = str.c_str();
-//   return cstr;
-// }
 
 void updateShader(EventHandler &eventHandler) {
   Camera &camera = eventHandler.camera();
 
-  glUniform2fv(shaderPan, 1, camera.pan());
-  glUniform1f(shaderZoom, camera.zoom());
+  // glUniform2fv(shaderPan, 1, camera.pan());
+  // glUniform1f(shaderZoom, camera.zoom());
   glUniform1f(shaderAspect, camera.aspect());
+  // passTime();
 }
 
 GLuint initShader(EventHandler &eventHandler) {
@@ -114,9 +103,10 @@ GLuint initShader(EventHandler &eventHandler) {
   glUseProgram(shaderProgram);
 
   // Get shader variables and initalize them
-  shaderPan = glGetUniformLocation(shaderProgram, "pan");
-  shaderZoom = glGetUniformLocation(shaderProgram, "zoom");
+  // shaderPan = glGetUniformLocation(shaderProgram, "pan");
+  // shaderZoom = glGetUniformLocation(shaderProgram, "zoom");
   shaderAspect = glGetUniformLocation(shaderProgram, "aspect");
+  shaderTime = glGetUniformLocation(shaderProgram, "uTime");
   updateShader(eventHandler);
 
   return shaderProgram;
@@ -214,6 +204,7 @@ void mainLoop(void *mainLoopArg) {
   // Update shader if camera changed
   if (eventHandler.camera().updated())
     updateShader(eventHandler);
+  passTime();
 
   redraw(eventHandler);
 }

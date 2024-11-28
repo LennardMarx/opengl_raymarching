@@ -172,10 +172,14 @@
 
 
 
-// precision mediump float;                            
-precision highp float;                            
-precision highp int;
+precision mediump float;                            
+precision mediump int;
+// precision highp float;                            
+// precision highp int;
 varying vec2 texCoord;                              
+uniform float aspect;
+uniform float uTime;
+float time_secs = uTime/1000.0;
 // uniform sampler2D texSampler;                       
 
 float sdBox( vec3 p, vec3 b )
@@ -201,10 +205,10 @@ float smin( float a, float b, float k )
 float map(vec3 p)
 {
     vec3 q = p;
-    // q.x += sin(gTime);
+    q.x += sin(time_secs);
     // q.x += sin(2.0);
     // q.y -= 2.0;
-    q.x += 2.0;
+    // q.x += 2.0;
     float box1 = sdBox(q, vec3(1.0));
 
     float ground = p.y + 0.75;
@@ -228,8 +232,7 @@ void main()
 {                                                   
       // gl_FragColor = texture2D(texSampler, texCoord); 
       // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    vec2 uv = (texCoord * 2.0 * -vec2(1600.0, 800.0)) / 800.0;
-    
+    vec2 uv = (texCoord * 2.0 * -vec2(aspect, 1.0)) / 1.0; 
       
     vec3 ro = vec3(0, 0, -5);         // ray origin
     vec3 rd = normalize(vec3(uv*0.5, 1)); // ray direction, adjusting FOV with miltiplier
@@ -245,7 +248,7 @@ void main()
     // Raymarching
     int i;
     i = 0;
-    for (int j = 0; j < 80; j++) {
+    for (int j = 0; j < 50; j++) {
         vec3 p = ro + rd * t;           // position along the ray 
       
         float d = map(p);               // current distance to the scene
@@ -253,7 +256,7 @@ void main()
         t += d;                         // march the ray
         // t += 0.1;
         i = j;
-        if(d < 0.001 || t > 100.0) break;
+        if(d < 0.001 || t > 80.0) break;
     }
       
     col = vec3(t* 0.04 + float(i)*0.004);
