@@ -13,6 +13,11 @@ float sdBox( vec3 p, vec3 b )
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+float sdSphere( vec3 p, float s )
+{
+  return length(p)-s;
+}
+
 float smin( float a, float b, float k )
 {
     float res = exp2( -k*a ) + exp2( -k*b );
@@ -21,14 +26,25 @@ float smin( float a, float b, float k )
 
 float map(vec3 p)
 {
-    vec3 q = p;
-    q.x += sin(time_sec);
   
-    float box1 = sdBox(q, vec3(1.0));
+  
+    vec3 spherePos = vec3(sin(time_sec)*3.0, 0.5, cos(time_sec)*3.0);
+    float sphere = sdSphere(p - spherePos, 1.0);
+  
+    vec3 q = p;
+  
+    // q.x += sin(time_sec);
+
+    q.y -= time_sec * 0.2;
+    
+    q = fract(q) - 0.5;
+  
+    float box1 = sdBox(q, vec3(0.1));
 
     float ground = p.y + 0.75;
 
-    float dist = smin(ground, box1, 5.0);
+    float dist = smin(ground, smin(sphere, box1, 10.0), 5.0);
+    // float dist = smin(ground, box1, 5.0);
     return dist;
 }
 
@@ -42,7 +58,8 @@ vec3 palette(float t){
 
 void main()                                         
 {                                                   
-    vec2 uv = (texCoord * 2.0 * -vec2(aspect, 1.0)) / 1.0; 
+    // vec2 uv = (texCoord * 2.0 * -vec2(aspect, 1.0)) / 1.0; 
+    vec2 uv = texCoord * 2.0 * -vec2(aspect, 1.0); 
       
     vec3 ro = vec3(0, 0, -5);         // ray origin
     vec3 rd = normalize(vec3(uv*0.5, 1)); // ray direction, adjusting FOV with miltiplier
@@ -58,7 +75,7 @@ void main()
     // Raymarching
     int i;
     i = 0;
-    for (int j = 0; j < 80; j++) {
+    for (int j = 0; j < 50; j++) {
         vec3 p = ro + rd * t;           // position along the ray 
       
         float d = map(p);               // current distance to the scene
@@ -66,11 +83,11 @@ void main()
         t += d;                         // march the ray
     
         i = j;
-        if(d < 0.001 || t > 100.0) break;
+        if(d < 0.001 || t > 80.0) break;
     }
       
     col = vec3(t* 0.04 + float(i)*0.004);
-    // col = palette(t * 0.04 + float(i)*0.005);
+    col = palette(t * 0.04 + float(i)*0.005);
 
     // col = vec3(t * 0.2);
     
