@@ -4,6 +4,8 @@ precision mediump int;
 varying vec2 texCoord;                              
 uniform float aspect;
 uniform float time_mil;
+uniform float camPos[3];
+vec3 gCamPos = vec3(camPos[0], camPos[1], camPos[2]);
 float time_sec = time_mil/1000.0;
 // uniform sampler2D texSampler;                       
 
@@ -65,7 +67,7 @@ void main()
     vec3 rd = normalize(vec3(uv*0.5, 1)); // ray direction, adjusting FOV with miltiplier
     vec3 col = vec3(1.0);            // pixel color
 
-    // ro += gCamPos;
+    ro += gCamPos;
 
     // rd.yz *= rot2D(gMouseDelta.y);
     // rd.xz *= rot2D(-gMouseDelta.x);

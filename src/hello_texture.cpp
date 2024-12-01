@@ -11,6 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "events.h"
 
@@ -22,6 +23,18 @@ GLuint textureObj = 0;
 GLint shaderPan, shaderZoom, shaderAspect;
 // Time
 GLint shaderTime;
+// Camera
+GLint shaderCamPos;
+
+// ===================
+bool gQuit = false;
+
+float u_xPos = 0.0f;
+float u_yPos = 0.0f;
+float u_zPos = 0.0f;
+
+static int mouseX = 0;
+static int mouseY = 0;
 
 // Function to read shader file
 std::string readShaderFile(const std::string &filePath) {
@@ -58,6 +71,7 @@ void updateShader(EventHandler &eventHandler) {
   // glUniform2fv(shaderPan, 1, camera.pan());
   // glUniform1f(shaderZoom, camera.zoom());
   glUniform1f(shaderAspect, camera.aspect());
+  glUniform1fv(shaderCamPos, 3, &camera.GetCamPos()[0]);
   // passTime();
 }
 
@@ -90,9 +104,70 @@ GLuint initShader(EventHandler &eventHandler) {
   // shaderZoom = glGetUniformLocation(shaderProgram, "zoom");
   shaderAspect = glGetUniformLocation(shaderProgram, "aspect");
   shaderTime = glGetUniformLocation(shaderProgram, "time_mil");
+  shaderCamPos = glGetUniformLocation(shaderProgram, "camPos");
   updateShader(eventHandler);
 
   return shaderProgram;
+}
+
+void Input() {
+  // static int mouseX = gScreenWidth / 2;
+  // static int mouseY = gScreenHeight / 2;
+  //
+  SDL_Event e;
+  while (SDL_PollEvent(&e) != 0) {
+    if (e.type == SDL_QUIT) {
+      std::cout << "SDL Quit" << std::endl;
+      gQuit = true;
+    } else if (e.type == SDL_MOUSEMOTION) {
+      mouseX += e.motion.xrel;
+      mouseY += e.motion.yrel;
+
+      // std::cout << "Mouse pos: " << glm::radians((float)mouseX) << ", "
+      //           << glm::radians((float)mouseY) << std::endl;
+      // gCamera.MouseLook(mouseX, mouseY);
+    }
+  }
+  // std::cout << "Eye pos: " << u_zPos << ", " << u_xPos << std::endl;
+
+  float speed = 0.15f;
+  const Uint8 *state = SDL_GetKeyboardState(NULL);
+  if (state[SDL_SCANCODE_W]) {
+    // gCamera.MoveForward(speed);
+    // u_zPos += speed;
+    u_zPos += cosf(-glm::radians((float)mouseX)) * speed;
+    u_xPos -= sinf(-glm::radians((float)mouseX)) * speed;
+  }
+  if (state[SDL_SCANCODE_S]) {
+    // gCamera.MoveBackward(speed);
+    // u_zPos -= speed;
+    u_zPos -= cosf(-glm::radians((float)mouseX)) * speed;
+    u_xPos += sinf(-glm::radians((float)mouseX)) * speed;
+  }
+  if (state[SDL_SCANCODE_D]) {
+    // gCamera.MoveRight(speed);
+    // u_xPos += speed;
+    u_zPos += sinf(-glm::radians((float)mouseX)) * speed;
+    u_xPos += cosf(-glm::radians((float)mouseX)) * speed;
+  }
+  if (state[SDL_SCANCODE_A]) {
+    // gCamera.MoveLeft(speed);
+    // u_xPos -= speed;
+    u_zPos -= sinf(-glm::radians((float)mouseX)) * speed;
+    u_xPos -= cosf(-glm::radians((float)mouseX)) * speed;
+  }
+  if (state[SDL_SCANCODE_SPACE]) {
+    // gCamera.MoveUp(speed);
+    u_yPos += speed;
+  }
+  if (state[SDL_SCANCODE_LSHIFT]) {
+    // gCamera.MoveDown(speed);
+    u_yPos -= speed;
+  }
+  if (state[SDL_SCANCODE_ESCAPE]) {
+    // gCamera.MoveDown(speed);
+    gQuit = true;
+  }
 }
 
 void initGeometry(GLuint shaderProgram) {
@@ -183,9 +258,12 @@ void mainLoop(void *mainLoopArg) {
   EventHandler &eventHandler = *((EventHandler *)mainLoopArg);
   eventHandler.processEvents();
 
+  Input();
+
   // Update shader if camera changed
   if (eventHandler.camera().updated())
     updateShader(eventHandler);
+  glm::vec3 camPos = glm::vec3(u_xPos, u_yPos, u_zPos);
   passTime();
 
   redraw(eventHandler);
