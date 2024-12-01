@@ -3,3 +3,5 @@
 -I
 /usr/include/GLES2
 -xc++
+-I
+src

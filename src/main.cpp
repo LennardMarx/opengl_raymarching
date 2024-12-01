@@ -14,10 +14,11 @@
 #include <vector>
 
 #include "events.h"
+// #include <events.h>
 
 // Texture
-const char *cTextureFilename = "media/texmap.png";
-GLuint textureObj = 0;
+// const char *cTextureFilename = "src/media/texmap.png";
+// GLuint textureObj = 0;
 
 // Vertex shader
 GLint shaderPan, shaderZoom, shaderAspect;
@@ -218,52 +219,51 @@ void initGeometry(GLuint shaderProgram) {
   glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-void initTexture() {
-  SDL_Surface *image = IMG_Load(cTextureFilename);
-
-  if (!image) {
-    // Create a fallback gray texture
-    printf("Failed to load %s, due to %s\n", cTextureFilename, IMG_GetError());
-    const int w = 128, h = 128, bitsPerPixel = 24;
-    image = SDL_CreateRGBSurface(0, w, h, bitsPerPixel, 0, 0, 0, 0);
-    if (image)
-      memset(image->pixels, 0x42, image->w * image->h * bitsPerPixel / 8);
-  }
-
-  if (image) {
-    int bitsPerPixel = image->format->BitsPerPixel;
-    printf("Image dimensions %dx%d, %d bits per pixel\n", image->w, image->h,
-           bitsPerPixel);
-
-    // Determine GL texture format
-    GLint format = -1;
-    if (bitsPerPixel == 24)
-      format = GL_RGB;
-    else if (bitsPerPixel == 32)
-      format = GL_RGBA;
-
-    if (format != -1) {
-      // Generate a GL texture object
-      glGenTextures(1, &textureObj);
-
-      // Bind GL texture
-      glBindTexture(GL_TEXTURE_2D, textureObj);
-
-      // Set the GL texture's wrapping and stretching properties
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-      // Copy SDL surface image to GL texture
-      glTexImage2D(GL_TEXTURE_2D, 0, format, image->w, image->h, 0, format,
-                   GL_UNSIGNED_BYTE, image->pixels);
-    }
-
-    SDL_FreeSurface(image);
-  }
-}
+// void initTexture() {
+//   SDL_Surface *image = IMG_Load(cTextureFilename);
+//
+//   if (!image) {
+//     // Create a fallback gray texture
+//     printf("Failed to load %s, due to %s\n", cTextureFilename,
+//     IMG_GetError()); const int w = 128, h = 128, bitsPerPixel = 24; image =
+//     SDL_CreateRGBSurface(0, w, h, bitsPerPixel, 0, 0, 0, 0); if (image)
+//       memset(image->pixels, 0x42, image->w * image->h * bitsPerPixel / 8);
+//   }
+//
+//   if (image) {
+//     int bitsPerPixel = image->format->BitsPerPixel;
+//     printf("Image dimensions %dx%d, %d bits per pixel\n", image->w, image->h,
+//            bitsPerPixel);
+//
+//     // Determine GL texture format
+//     GLint format = -1;
+//     if (bitsPerPixel == 24)
+//       format = GL_RGB;
+//     else if (bitsPerPixel == 32)
+//       format = GL_RGBA;
+//
+//     if (format != -1) {
+//       // Generate a GL texture object
+//       glGenTextures(1, &textureObj);
+//
+//       // Bind GL texture
+//       glBindTexture(GL_TEXTURE_2D, textureObj);
+//
+//       // Set the GL texture's wrapping and stretching properties
+//       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//
+//       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//
+//       // Copy SDL surface image to GL texture
+//       glTexImage2D(GL_TEXTURE_2D, 0, format, image->w, image->h, 0, format,
+//                    GL_UNSIGNED_BYTE, image->pixels);
+//     }
+//
+//     SDL_FreeSurface(image);
+//   }
+// }
 
 void redraw(EventHandler &eventHandler) {
   // Clear screen
@@ -294,12 +294,12 @@ void mainLoop(void *mainLoopArg) {
 }
 
 int main(int argc, char **argv) {
-  EventHandler eventHandler("Hello Texture");
+  EventHandler eventHandler("OpenGL Raymarching");
 
   // Initialize shader, geometry, and texture
   GLuint shaderProgram = initShader(eventHandler);
   initGeometry(shaderProgram);
-  initTexture();
+  // initTexture();
 
   // Start the main loop
   void *mainLoopArg = &eventHandler;
@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
     mainLoop(mainLoopArg);
 #endif
 
-  glDeleteTextures(1, &textureObj);
+  // glDeleteTextures(1, &textureObj);
 
   return 0;
 }
