@@ -4,10 +4,21 @@ precision mediump int;
 varying vec2 texCoord;                              
 uniform float aspect;
 uniform float time_mil;
+
 uniform float camPos[3];
 vec3 gCamPos = vec3(camPos[0], camPos[1], camPos[2]);
+
+uniform float mouseDelta[2];
+vec2 gMouseDelta = vec2(mouseDelta[0], mouseDelta[1]);
+
 float time_sec = time_mil/1000.0;
 // uniform sampler2D texSampler;                       
+
+mat2 rot2D(float angle){
+  float s = sin(angle);
+  float c = cos(angle);
+  return mat2(c, -s, s, c);
+}
 
 float sdBox( vec3 p, vec3 b )
 {
@@ -69,8 +80,8 @@ void main()
 
     ro += gCamPos;
 
-    // rd.yz *= rot2D(gMouseDelta.y);
-    // rd.xz *= rot2D(-gMouseDelta.x);
+    rd.yz *= rot2D(gMouseDelta.y);
+    rd.xz *= rot2D(-gMouseDelta.x);
 
     float t = 0.0;                   // travelled distance of ray
 
