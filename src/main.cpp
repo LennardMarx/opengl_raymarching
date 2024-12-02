@@ -77,14 +77,6 @@ void updateShader(EventHandler &eventHandler) {
   // glUniform1fv(shaderCamPos, 3, &camera.GetCamPos()[0]);
   glUniform1fv(shaderCamPos, 3, &camPos[0]);
   glUniform1fv(shaderMouseDelta, 3, &eventHandler.GetMousePos()[0]);
-  // print mouseDelta
-  // std::cout << "Mouse: " << eventHandler.GetMousePos().x << ", "
-  //           << eventHandler.GetMousePos().y << std::endl;
-
-  // print campos
-  // std::cout << "Camera: " << camPos.x << ", " << camPos.y << ", " << camPos.z
-  //           << std::endl;
-  // passTime();
 }
 
 GLuint initShader(EventHandler &eventHandler) {
